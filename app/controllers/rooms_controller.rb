@@ -27,6 +27,11 @@ class RoomsController < ApplicationController
           redirect_to @room, alert: 'You are not the owner of this room.'
         end
       end
+
+      def update_characterisitcs
+        player.visible_characteristics = params[:visible_characterisits]
+        player.save
+      end
     
       def show
         @room = Room.find(params[:id])
@@ -34,6 +39,10 @@ class RoomsController < ApplicationController
         @player = Player.new
         city_name = 'Kyiv'
         @weather_info = OpenWeatherMapService.weather_for_city(city_name)
+        @visible_characteristics = players.each_with_object({}) do |p, h|
+          h[p] = p.slice(*p.visible_characterisits)
+          { user => [aasd, asd]}
+        end
       end
 
       def destroy
