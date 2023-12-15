@@ -58,19 +58,9 @@
   <% end %>
 <% end %>
 
-# <% if @room.turn_status == 'waiting_for_characteristic' %>
-#   <h2>Open Characteristics for Other Players</h2>
-#   <ul>
-#     <% @players.each do |player| %>
-#       <li>
-#         <%= player.user.email %>
-#         <% Characteristic.attribute_names.each do |characteristic_name| %>
-#           <%= button_to "Open #{characteristic_name.titleize} for Others", set_visible_characteristic_room_path(@room, characteristic_name: characteristic_name), method: :post, class: 'open-characteristic-button' %>
-#         <% end %>
-#       </li>
-#     <% end %>
-#   </ul>
-# <% end %>
+
+
+
 
 <h1>Weather Information</h1>
 <% if @weather_info.present? %>
@@ -81,6 +71,7 @@
 <% end %>
 
 
+<!-- app/views/rooms/show.html.erb -->
 <% @players.each do |player| %>
   <div class="characteristics-list">
     <!-- Решта HTML-коду ... -->
@@ -95,3 +86,12 @@
 
 <!-- Додаємо це вниз сторінки -->
 <div id="vote-message" style="display: none;"></div>
+
+<% if @room.turn_status == 'result_announced' %>
+  <p>Player <%= @room.voted_out_player.user.email %> has been voted out!</p>
+<% end %>
+
+
+<% if @room.owner == current_user && @room.turn_status == 'voting' %>
+  <%= button_to 'End Voting', end_voting_room_path(@room), method: :post %>
+<% end %>

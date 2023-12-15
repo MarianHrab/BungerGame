@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       post 'start_game'
       post 'set_visible_characteristic'
       post 'vote_for_player'
+      post 'end_voting'
     end
     delete 'destroy'
   end

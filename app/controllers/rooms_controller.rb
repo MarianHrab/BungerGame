@@ -103,26 +103,29 @@ class RoomsController < ApplicationController
   end
   
   
-   def destroy
+  def destroy
     @room = Room.find(params[:id])
     @room.players.destroy_all
     @room.destroy
     redirect_to rooms_path, notice: 'Room was successfully destroyed.'
   end
- def check_owner
-        unless @room.owner == current_user
-          redirect_to @room, alert: 'You are not the owner of this room.'
-        end
-      end
+
+
+  def check_owner
+    unless @room.owner == current_user
+      redirect_to @room, alert: 'You are not the owner of this room.'
+    end
+  end
 
     
     
-      def show
-        @room = Room.find(params[:id])
-        @players = @room.players.includes(:characteristic)
-        @player = Player.new
-        city_name = 'Kyiv'
-        @weather_info = OpenWeatherMapService.weather_for_city(city_name)
+  def show
+    @room = Room.find(params[:id])
+    @players = @room.players.includes(:characteristic)
+    @player = Player.new
+    city_name = 'Kyiv'
+    @weather_info = OpenWeatherMapService.weather_for_city(city_name)
+  end
         
 
   def take_slot
@@ -149,6 +152,7 @@ class RoomsController < ApplicationController
       @room.update(game_started: true)
   
       @room.players.each do |player|
+        Rails.logger.debug("Creating characteristic for player #{player.user.email}")
         player.create_initial_characteristic
       end
   
@@ -157,6 +161,7 @@ class RoomsController < ApplicationController
   
     redirect_to @room
   end
+  
   
 
   def set_visible_characteristic
@@ -205,16 +210,51 @@ class RoomsController < ApplicationController
     if @room.turn_status == 'voting' && @room.players.exists?(user_id: current_user.id) && @player != current_user.players.first
       Vote.create(player: @player)
       flash[:notice] = 'Ваш голос зараховано!'
+  
+      # Check if all players have voted
+      if @room.players.all? { |p| p.votes.any? }
+        calculate_votes
+      end
     else
       flash[:alert] = 'Сталася помилка при голосуванні.'
     end
   
     redirect_to @room
   end
-  
-  
 
+  def end_voting
+    @room = Room.find(params[:id])
+
+    if @room.owner == current_user && @room.turn_status == 'voting'
+      calculate_votes
+      flash[:notice] = 'Voting has been manually ended.'
+    else
+      flash[:alert] = 'You are not authorized to end the voting process.'
+    end
+
+    redirect_to @room
+  end
+
+  
   private
+
+  def calculate_votes
+    # Count votes for each player
+    votes_count = Hash.new(0)
+    @room.players.each do |player|
+      player.votes.each do |vote|
+        votes_count[vote.player_id] += 1
+      end
+    end
+  
+    # Find the player with the maximum votes
+    voted_out_player_id = votes_count.max_by { |_player_id, count| count }&.first
+  
+    # Update the room with the voted-out player
+    @room.update(voted_out_player_id: voted_out_player_id, turn_status: 'result_announced')
+  end
+
+
 
   def room_params
     params.require(:room).permit(:name, :limit)
@@ -224,3 +264,15 @@ class RoomsController < ApplicationController
     params.require(:player).permit(:name)
   end
 end
+
+# <h2>Open Characteristics for Other Players</h2>
+# <ul>
+#   <% @players.each do |player| %>
+#     <% unless player == current_user.players.first %>
+#       <li>
+#         <%= player.user.email %>
+#         <%= button_to 'Open Characteristics', set_visible_characteristic_room_path(@room, player_id: player.id), method: :post, remote: true %>
+#       </li>
+#     <% end %>
+#   <% end %>
+# </ul>
