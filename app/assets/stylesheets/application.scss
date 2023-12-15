@@ -99,3 +99,14 @@
     text-decoration: underline; /* або інший стиль при наведенні */
   }
   
+  .open-characteristic-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px; /* або інша ширина за бажанням */
+    height: 30px; /* або інша висота за бажанням */
+    background-color: #3498db; /* або інший колір за бажанням */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+  }

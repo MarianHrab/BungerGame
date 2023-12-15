@@ -1,13 +1,7 @@
 <!-- app/views/rooms/show.html.erb -->
 <h1><%= @room.name %></h1>
 
-<% if current_user %>
-  <p>Current User:</p>
-  <p>Name: <%= current_user.email %></p>
-  <p>ID: <%= current_user.id %></p>
-<% else %>
-  <p>No user logged in.</p>
-<% end %>
+<p>Current Turn Status: <%= @room.turn_status %></p>
 
 <div class="players-text">
   <h2>Players in the room</h2>
@@ -28,6 +22,10 @@
                   <%= value %>
                 <% else %>
                   <%= "Hidden" %>
+                <% end %>
+                <% if @room.turn_status == 'waiting_for_characteristic' && !player.opened_characteristics&.include?(name) %>
+                  <!-- Додайте кнопку відкриття цієї характеристики для цього гравця -->
+                  <%= button_to '', set_visible_characteristic_room_path(@room, characteristic_name: name, player_id: player.id), method: :post, class: 'open-characteristic-button' %>
                 <% end %>
               </li>
             <% end %>
@@ -57,10 +55,7 @@
     <%= f.submit 'Delete Room' %>
   <% end %>
 <% end %>
-
-
-
-
+    
 
 <h1>Weather Information</h1>
 <% if @weather_info.present? %>

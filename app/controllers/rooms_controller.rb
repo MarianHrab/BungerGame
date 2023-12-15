@@ -149,11 +149,10 @@ class RoomsController < ApplicationController
     @room = Room.find(params[:id])
   
     if @room.owner == current_user && !@room.game_started
-      @room.update(game_started: true)
+      @room.update(game_started: true, turn_status: 'waiting_for_characteristic')
   
       @room.players.each do |player|
-        Rails.logger.debug("Creating characteristic for player #{player.user.email}")
-        player.create_initial_characteristic
+        player.create_characteristic
       end
   
       flash[:notice] = 'Гра почалася!'
@@ -221,20 +220,7 @@ class RoomsController < ApplicationController
   
     redirect_to @room
   end
-
-  def end_voting
-    @room = Room.find(params[:id])
-
-    if @room.owner == current_user && @room.turn_status == 'voting'
-      calculate_votes
-      flash[:notice] = 'Voting has been manually ended.'
-    else
-      flash[:alert] = 'You are not authorized to end the voting process.'
-    end
-
-    redirect_to @room
-  end
-
+  
   
   private
 

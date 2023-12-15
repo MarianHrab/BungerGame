@@ -6,10 +6,7 @@ class Room < ApplicationRecord
   validates :name, presence: true
   validates :limit, presence: true, numericality: { greater_than_or_equal_to: 1, only_integer: true }
 
-  enum status: { waiting_for_characteristic: 0, voting: 1, result_announced: 2 }
+  enum turn_status: { waiting_for_characteristic: 0, voting: 1 }
 
   serialize :current_turn_data, Hash, coder: JSON
-
-  # Add this line to define the voted_out_player_id attribute
-  attribute :voted_out_player_id, :integer
 end
