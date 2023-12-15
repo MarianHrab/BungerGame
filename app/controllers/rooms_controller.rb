@@ -26,7 +26,7 @@ class RoomsController < ApplicationController
   #     redirect_to @room, alert: 'You are not the owner of this room.'
   #   end
   # end
-
+ 
   def update_characteristics
     @room = Room.find(params[:id])
     @player = current_user.players.find_by(room: @room)
