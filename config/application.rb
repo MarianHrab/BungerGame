@@ -2,6 +2,7 @@ require_relative "boot"
 
 require "rails/all"
 require 'faker'
+# require "sprockets/railtie"
 
 
 # Require the gems listed in Gemfile, including any gems
@@ -12,6 +13,8 @@ module BunkerGame
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.1
+    # config.assets.js_compressor = Uglifier.new(harmony: true) # Додайте це рядок
+
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.

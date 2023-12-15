@@ -2,7 +2,12 @@ source "https://rubygems.org"
 
 ruby "3.0.2"
 
-
+gem 'webpacker'
+gem 'bootstrap', '~> 5.2', '>= 5.2.3'
+gem 'mini_racer'
+gem 'dartsass-sprockets'
+# gem 'sassc-rails'
+# gem 'uglifier', '>= 1.3.0'
 gem 'faker', require: false
 
 gem 'httparty'

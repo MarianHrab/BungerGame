@@ -1,0 +1,24 @@
+<!-- app/views/rooms/_characteristics_list.html.erb -->
+<% if player.characteristic.present? %>
+  <div class="characteristics-list">
+    <ul>
+      <% player.characteristic.attributes.each do |name, value| %>
+        <% unless ['id', 'created_at', 'updated_at', 'player_id'].include?(name) %>
+          <% if player == current_user.players.first || player.visible_characteristics&.include?(name) %>
+            <li>
+              <strong><%= name.titleize %>:</strong>
+              <%= value %>
+            </li>
+          <% end %>
+        <% end %>
+      <% end %>
+      <!-- Add the player's email -->
+      <li>
+        <strong>Email:</strong>
+        <%= player.user.email %>
+      </li>
+    </ul>
+  </div>
+<% else %>
+  <p>No characteristics available.</p>
+<% end %>

@@ -18,7 +18,8 @@ Rails.application.routes.draw do
     member do
       post 'take_slot'
       post 'start_game'
-      post 'open_characteristics_for_player'
+      post 'set_visible_characteristic'
+      post 'vote_for_player'
     end
     delete 'destroy'
   end
@@ -29,5 +30,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
   post '/toggle_visibility/:characteristic_name', to: 'players#toggle_visibility', as: :toggle_visibility
-
+  
+  get 'rules', to: 'rules#index'
+  get 'contacts', to: 'contacts#index'
 end

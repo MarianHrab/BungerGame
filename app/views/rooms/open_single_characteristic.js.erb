@@ -1,0 +1,5 @@
+<!-- app/views/rooms/open_single_characteristic.js.erb -->
+<% @players.each do |player| %>
+  var playerRow = $('#player_<%= player.id %>');
+  playerRow.find('.characteristics-list').html('<%= j render partial: "characteristics_list", locals: { player: player } %>');
+<% end %>

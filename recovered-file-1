@@ -1,0 +1,92 @@
+<!-- app/views/rooms/show.html.erb -->
+<h1><%= @room.name %></h1>
+
+<h2>Players</h2>
+<p>Limit: <%= @room.limit %></p>
+<ul>
+  <% @players.each do |player| %>
+    <li>
+      <%= player.user.email %>
+      <% if player == current_user.players.first && player.characteristic.present? %>
+        <ul>
+          <% player.characteristic.attributes.each do |name, value| %>
+            <% unless ['id', 'created_at', 'updated_at', 'player_id'].include?(name) %>
+              <li>
+                <strong><%= name.titleize %>:</strong>
+                <% if player == current_user.players.first %>
+                  <%= value %>
+                <% elsif player.visible_characteristics&.include?(name) %>
+                  <%= value %>
+                <% else %>
+                  <%= "Hidden" %>
+                <% end %>
+              </li>
+            <% end %>
+          <% end %>
+        </ul>
+      <% elsif player.characteristic.present? %>
+        <!-- Показати тільки назви характеристик для інших гравців -->
+        <ul>
+          <% player.characteristic.attributes.each do |name, value| %>
+            <% unless ['id', 'created_at', 'updated_at', 'player_id'].include?(name) %>
+              <li>
+                <strong><%= name.titleize %>:</strong>
+                <% if player.visible_characteristics&.include?(name) %>
+                  <%= value %>
+                <% else %>
+                  <%= "Hidden" %>
+                  &#128274;
+                <% end %>
+              </li>
+            <% end %>
+          <% end %>
+        </ul>
+      <% else %>
+        <p>No characteristics available.</p>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
+<% unless @room.players.exists?(user_id: current_user.id) %>
+  <%= button_to 'Take Slot', take_slot_room_path(@room), method: :post %>
+<% end %>
+
+<% if @room.owner == current_user %>
+  <% if @room.players.count >= 2 %>
+    <%= button_to 'Start Game', start_game_room_path(@room), method: :post %>
+  <% else %>
+    <p>Waiting for more players to start the game...</p>
+  <% end %>
+<% end %>
+
+<% if @room.owner == current_user %>
+  <%= form_for @room, method: :delete, data: { confirm: 'Are you sure?' } do |f| %>
+    <%= f.submit 'Delete Room' %>
+  <% end %>
+<% end %>
+
+<%= link_to 'Back', rooms_path %>
+
+
+
+<h2>Open Characteristics for Other Players</h2>
+<ul>
+  <% @players.each do |player| %>
+    <% unless player == current_user.players.first %>
+      <li>
+        <%= player.user.email %>
+        <%= button_to 'Open Characteristics', open_characteristics_for_player_room_path(@room, player_id: player.id), method: :post, remote: true %>
+      </li>
+    <% end %>
+  <% end %>
+</ul>
+
+
+
+<h1>Weather Information</h1>
+<% if @weather_info.present? %>
+  <p>Temperature: <%= (@weather_info['main']['temp'] - 273.15).round %> °C</p>
+  <p>Humidity: <%= @weather_info['main']['humidity'] %> %</p>
+<% else %>
+  <p>No weather information available.</p>
+<% end %>

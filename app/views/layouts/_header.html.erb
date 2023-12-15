@@ -1,14 +1,20 @@
-<!-- app/views/layouts/_header.html.erb -->
-<header style="display: flex; justify-content: space-between; align-items: center;">
+<header>
   <!-- Your header content goes here -->
-  <h1>Bunker</h1>
-  <nav style="display: flex; gap: 20px;">
-      <% if user_signed_in? %>
-        <p>Hello, <%= current_user.email %></p>
-        <%= link_to 'Logout', logout_path, method: :delete %>
-      <% else %>
-        <%= link_to "Login", new_user_session_path %>
-        <%= link_to "Register", new_user_registration_path %>
-      <% end %>
-    </nav>
+  <div class="branding">
+    <h1>Bunker</h1>
+  </div>
+  <nav>
+    <a href="/rooms">Rooms</a>
+    <a href="/profile">Profile</a>
+    <a href="/contacts">Contacts</a>
+    <a href="/rules">Rules</a>
+  </nav>
+  <div class="auth-button">
+    <% if user_signed_in? %>
+      <%= link_to 'Logout', logout_path, method: :delete, class: "auth-button" %>
+    <% else %>
+      <%= link_to "Login", new_user_session_path, class: "auth-button" %>
+      <%= link_to "Register", new_user_registration_path, class: "auth-button" %>
+    <% end %>
+  </div>
 </header>
