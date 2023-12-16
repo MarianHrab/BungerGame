@@ -16,13 +16,15 @@
         <ul>
           <% player.characteristic.attributes.each do |name, value| %>
             <% unless ['id', 'created_at', 'updated_at', 'player_id'].include?(name) %>
-              <li>
-                <strong><%= name.titleize %>:</strong>
-                <% if current_user == player.user || (player.visible_characteristics&.include?(name) && @room.turn_status == 'voting') %>
-                  <%= value %>
-                <% else %>
-                  <%= "Hidden" %>
-                <% end %>
+              <li class="characteristic-item">
+                <div class="characteristic-info">
+                  <strong><%= name.titleize %>:</strong>
+                  <% if current_user == player.user || (player.visible_characteristics&.include?(name) && @room.turn_status == 'voting') %>
+                    <%= value %>
+                  <% else %>
+                    <%= "Hidden" %>
+                  <% end %>
+                </div>
                 <% if @room.turn_status == 'waiting_for_characteristic' && !player.opened_characteristics&.include?(name) %>
                   <!-- Додайте кнопку відкриття цієї характеристики для цього гравця -->
                   <%= button_to '', set_visible_characteristic_room_path(@room, characteristic_name: name, player_id: player.id), method: :post, class: 'open-characteristic-button' %>

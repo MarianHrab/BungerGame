@@ -28,20 +28,28 @@
   .characteristics-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px; /* Adjust the gap between columns as needed */
+    gap: 20px;
     margin-left: 200px;
     margin-right: 200px;
+  }
+  
+  
+  .characteristic-info {
+    flex: 1; /* Займати доступне простору для інформації про характеристику */
   }
   
   .characteristics-list {
     list-style-type: none;
     padding: 0;
-    border: 1px solid #ddd; /* Add border for separation */
+    border: 1px solid #ddd;
     border-radius: 8px;
     padding: 10px;
-    margin-bottom: 20px; /* Adjust the margin between player blocks as needed */
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between; /* Розташування вирівнювання вправо */
+    align-items: center;
   }
-  
+
   .characteristics-list-container {
     margin: auto; /* Center the characteristics list container */
   }
@@ -100,13 +108,59 @@
   }
   
   .open-characteristic-button {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 30px; /* або інша ширина за бажанням */
-    height: 30px; /* або інша висота за бажанням */
-    background-color: #3498db; /* або інший колір за бажанням */
+    width: 30px;
+    height: 30px;
+    background-color: #3498db;
     color: #fff;
     border: none;
     border-radius: 5px;
   }
+
+  body {
+  background-color: #000000;
+  color: #F2B705;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.login-container {
+  border: 2px solid #FFFFFF;
+  padding: 20px;
+  text-align: center;
+}
+
+.label {
+  color: #FFFFFF;
+  font-size: 36px;
+}
+
+.input {
+  color: #FFFFFF;
+  font-size: 36px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.remember-checkbox {
+  color: #FFFFFF;
+  font-size: 18px;
+}
+
+.remember-label {
+  color: #FFFFFF;
+  font-size: 18px;
+}
+
+
+
+
+
+
+
+
+
