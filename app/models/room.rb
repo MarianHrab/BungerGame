@@ -9,4 +9,7 @@ class Room < ApplicationRecord
   enum turn_status: { waiting_for_characteristic: 0, voting: 1 }
 
   serialize :current_turn_data, Hash, coder: JSON
+  validates :turn_status, inclusion: { in: %w(waiting_for_characteristic voting result_announced game_over),
+    message: "%{value} is not a valid turn_status" }
+
 end

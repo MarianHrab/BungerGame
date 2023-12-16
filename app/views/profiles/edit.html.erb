@@ -1,0 +1,17 @@
+<h1>Edit Profile</h1>
+
+<%= form_with(model: @profile, url: profile_path, method: :put, local: true, html: {multipart: true}) do |form| %>
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :avatar %>
+    <%= form.file_field :avatar %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit 'Update Profile' %>
+  </div>
+<% end %>

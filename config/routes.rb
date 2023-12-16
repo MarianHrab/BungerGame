@@ -19,11 +19,18 @@ Rails.application.routes.draw do
       post 'take_slot'
       post 'start_game'
       post 'set_visible_characteristic'
-      post 'vote_for_player'
-      post 'end_voting'
+      post 'kick_player'
+      post 'open_characteristic'
+      # post 'vote_for_player'
+      # post 'end_voting'
     end
     delete 'destroy'
   end
+
+
+  resource :profile, only: [:edit, :update]
+
+
 
   devise_scope :user do
     get '/logout', to: 'devise/sessions#destroy', as: :logout
@@ -32,6 +39,7 @@ Rails.application.routes.draw do
   # root "posts#index"
   post '/toggle_visibility/:characteristic_name', to: 'players#toggle_visibility', as: :toggle_visibility
   
+  get 'profile', to: 'profiles#edit'
   get 'rules', to: 'rules#index'
   get 'contacts', to: 'contacts#index'
 end

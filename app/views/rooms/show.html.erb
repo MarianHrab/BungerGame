@@ -11,7 +11,7 @@
   <!-- Characteristics of other players -->
   <% @players.each do |player| %>
     <div class="characteristics-list">
-      <p><strong>Email:</strong> <%= player.user.email %></p>
+      <p><strong>Name:</strong> <%= player.user.name.present? ? player.user.name : player.user.email %></p>
       <% if player.characteristic.present? %>
         <ul>
           <% player.characteristic.attributes.each do |name, value| %>
@@ -25,10 +25,6 @@
                     <%= "Hidden" %>
                   <% end %>
                 </div>
-                <% if @room.turn_status == 'waiting_for_characteristic' && !player.opened_characteristics&.include?(name) %>
-                  <!-- Додайте кнопку відкриття цієї характеристики для цього гравця -->
-                  <%= button_to '', set_visible_characteristic_room_path(@room, characteristic_name: name, player_id: player.id), method: :post, class: 'open-characteristic-button' %>
-                <% end %>
               </li>
             <% end %>
           <% end %>
@@ -52,14 +48,45 @@
   <% end %>
 <% end %>
 
+
+
 <% if @room.owner == current_user %>
   <%= form_for @room, method: :delete, data: { confirm: 'Are you sure?' } do |f| %>
     <%= f.submit 'Delete Room' %>
   <% end %>
 <% end %>
-    
 
-<h1>Weather Information</h1>
+
+<% if @room.owner == current_user %>
+  <%= form_for @room, url: kick_player_room_path(@room), method: :post do |f| %>
+    <%= label_tag 'player_id', 'Select player to kick:' %>
+    <%= select_tag 'player_id', options_for_select(@room.players.map { |player| [player.user.email, player.id] }) %>
+    <%= f.submit 'Вигнати', class: 'kick-button' %>
+  <% end %>
+<% end %>
+
+
+
+<% if @room.owner == current_user %>
+  <%= form_for @room, url: open_characteristic_room_path(@room), method: :post do |f| %>
+    <%= label_tag 'player_id', 'Select player to open characteristic:' %>
+    <%= select_tag 'player_id', options_for_select(@room.players.map { |player| [player.user.email, player.id] }) %>
+    <%= f.submit 'Відкрити', class: 'open-button' %>
+  <% end %>
+<% end %>
+
+
+
+
+
+
+
+
+
+
+
+<h1>API SECTION</h1>
+<h4>Weather API</h4>
 <% if @weather_info.present? %>
   <p>Temperature: <%= (@weather_info['main']['temp'] - 273.15).round %> °C</p>
   <p>Humidity: <%= @weather_info['main']['humidity'] %> %</p>
@@ -67,28 +94,16 @@
   <p>No weather information available.</p>
 <% end %>
 
-
-<!-- app/views/rooms/show.html.erb -->
-<% @players.each do |player| %>
-  <div class="characteristics-list">
-    <!-- Решта HTML-коду ... -->
-
-    <% if current_user.present? && current_user != player.user && @room.turn_status == 'voting' %>
-      <%= form_tag vote_for_player_room_path(@room, player_id: player.id), method: :post do %>
-        <%= submit_tag "Голосувати за #{player.user.email}", class: 'vote-button' %>
-      <% end %>
+<h4>Deezer API</h4>
+<% if @search_results.present? && @search_results['data'].present? %>
+  <ul>
+    <% @search_results['data'].take(2).each do |track| %>
+      <li>
+        <strong>Title:</strong> <%= track['title'] %><br>
+        <strong>Artist:</strong> <%= track['artist']['name'] %>
+      </li>
     <% end %>
-  </div>
-<% end %>
-
-<!-- Додаємо це вниз сторінки -->
-<div id="vote-message" style="display: none;"></div>
-
-<% if @room.turn_status == 'result_announced' %>
-  <p>Player <%= @room.voted_out_player.user.email %> has been voted out!</p>
-<% end %>
-
-
-<% if @room.owner == current_user && @room.turn_status == 'voting' %>
-  <%= button_to 'End Voting', end_voting_room_path(@room), method: :post %>
+  </ul>
+<% else %>
+  <p>No search results available.</p>
 <% end %>

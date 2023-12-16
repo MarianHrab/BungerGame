@@ -42,47 +42,7 @@ class RoomsController < ApplicationController
     redirect_to @room
   end
 
-  # app/controllers/rooms_controller.rb
-  # def open_single_characteristic
-  #   @room = Room.find(params[:id])
-  #   @players = @room.players.includes(:characteristic)
-  #   @player = current_user.players.find_by(room: @room)
-  
-  #   player_to_open = @players.each_with_object({}) do |player, h|
-  #     characteristics = player.characteristic&.attributes
-  
-  #     if player_to_open && player_to_open.user == current_user || @room.players.exists?(user_id: current_user.id)
-  #       if characteristics
-  #         h[player] = characteristics['visible_characteristics']
-  
-  #         if h[player]
-  #           if current_user == @room.owner || player_to_open == current_user.players.first
-  #             opened_characteristics = player_to_open.opened_characteristics || []
-  #             opened_characteristics << characteristic_name
-  #             player_to_open.update(characteristics_visible: true, opened_characteristics: opened_characteristics.uniq)
-  #             flash[:notice] = "Characteristics have been opened for #{player_to_open.user.email}."
-  #           else
-  #             flash[:alert] = "Unable to open characteristics."
-  #           end
-  #         else
-  #           flash[:alert] = "Visible characteristics not found for player #{player.user.email}."
-  #         end
-  #       else
-  #         flash[:alert] = "Characteristics not found for player #{player.user.email}."
-  #       end
-  #     end
-  #   end
-  #   redirect_to @room
-  # end
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
   def show
     @room = Room.find(params[:id])
     @players = @room.players.includes(:characteristic)
@@ -125,7 +85,10 @@ class RoomsController < ApplicationController
     @player = Player.new
     city_name = 'Kyiv'
     @weather_info = OpenWeatherMapService.weather_for_city(city_name)
+    query = 'skillet' # Replace with the actual search query
+    @search_results = DeezerSearchService.search_tracks(query)
   end
+
         
 
   def take_slot
@@ -163,29 +126,98 @@ class RoomsController < ApplicationController
   
   
 
-  def set_visible_characteristic
+  # def set_visible_characteristic
+  #   @room = Room.find(params[:id])
+  
+  #   if @room.turn_status == 'waiting_for_characteristic' && current_user == @room.owner
+  #     current_turn_data = @room.current_turn_data || {}
+  #     current_turn_data[:turn_number] ||= 0
+  #     current_turn_data[:turn_number] += 1
+  
+  #     @room.players.each do |player|
+  #       if !player.characteristics_visible
+  #         visible_characteristic = player.get_next_visible_characteristic
+  #         player.visible_characteristics = [visible_characteristic]
+  #         player.update(characteristics_visible: true)
+  #       end
+  #     end
+  
+  #     if @room.players.all?(&:characteristics_visible)
+  #       @room.update(turn_status: :voting, current_turn_data: current_turn_data)
+  #     end
+  #   end
+  
+  #   # Оновлення характеристик для всіх гравців на сторінці
+  #   @visible_characteristics = @room.players.each_with_object({}) do |player, h|
+  #     characteristics = player.characteristic&.visible_characteristics
+  
+  #     if characteristics
+  #       if current_user == player.user && player.characteristics_visible
+  #         h[player] = player.characteristic.attributes.slice(*characteristics)
+  #       else
+  #         h[player] = characteristics.map { |name| [name, "Hidden"] }.to_h
+  #       end
+  #     end
+  #   end
+  
+  #   render :show
+  # end
+  
+  
+  def kick_player
+    @room = Room.find(params[:id])
+    
+    if @room.owner == current_user
+      player_id = params[:player_id]
+      player = @room.players.find(player_id)
+  
+      if player
+        player.destroy
+        flash[:notice] = "Гравця вигнано з кімнати."
+      else
+        flash[:alert] = "Не вдалося знайти гравця."
+      end
+    else
+      flash[:alert] = "Ви не є власником цієї кімнати."
+    end
+    
+    redirect_to @room
+  end
+  
+  def choose_characteristic
     @room = Room.find(params[:id])
   
-    if @room.turn_status == 'waiting_for_characteristic' && current_user == @room.owner
-      current_turn_data = @room.current_turn_data || {}
-      current_turn_data[:turn_number] ||= 0
-      current_turn_data[:turn_number] += 1
+    # Перевіряємо, чи власник кімнати
+    if @room.owner == current_user
+      player_id = params[:player_id]
+      characteristic_name = params[:characteristic_name]
   
-      @room.players.each do |player|
-        if !player.characteristics_visible
-          visible_characteristic = player.get_next_visible_characteristic
-          player.visible_characteristics ||= []
-          player.visible_characteristics << visible_characteristic
-          player.update(characteristics_visible: true)
-        end
-      end
+      player = @room.players.find(player_id)
   
-      if @room.players.all?(&:characteristics_visible)
-        @room.update(turn_status: :voting, current_turn_data: current_turn_data)
+      if player && characteristic_name.present?
+        # Встановлюємо видиму характеристику для гравця
+        player.visible_characteristics ||= []
+        player.visible_characteristics << characteristic_name
+        player.update(characteristics_visible: true)
+  
+        # Оновлюємо характеристики для всіх гравців на сторінці
+        update_visible_characteristics
+  
+        flash[:notice] = "Характеристику '#{characteristic_name}' вибрано для гравця #{player.user.email}."
+      else
+        flash[:alert] = "Не вдалося знайти гравця або характеристику."
       end
+    else
+      flash[:alert] = "Ви не є власником цієї кімнати."
     end
   
-    # Оновлення характеристик для всіх гравців на сторінці
+    redirect_to @room
+  end
+  
+  private
+  
+  # Оновлюємо видимі характеристики для всіх гравців на сторінці
+  def update_visible_characteristics
     @visible_characteristics = @room.players.each_with_object({}) do |player, h|
       characteristics = player.characteristic&.visible_characteristics
   
@@ -197,49 +229,8 @@ class RoomsController < ApplicationController
         end
       end
     end
-  
-    render :show
   end
   
-  
-  def vote_for_player
-    @room = Room.find(params[:id])
-    @player = Player.find(params[:player_id])
-  
-    if @room.turn_status == 'voting' && @room.players.exists?(user_id: current_user.id) && @player != current_user.players.first
-      Vote.create(player: @player)
-      flash[:notice] = 'Ваш голос зараховано!'
-  
-      # Check if all players have voted
-      if @room.players.all? { |p| p.votes.any? }
-        calculate_votes
-      end
-    else
-      flash[:alert] = 'Сталася помилка при голосуванні.'
-    end
-  
-    redirect_to @room
-  end
-  
-  
-  private
-
-  def calculate_votes
-    # Count votes for each player
-    votes_count = Hash.new(0)
-    @room.players.each do |player|
-      player.votes.each do |vote|
-        votes_count[vote.player_id] += 1
-      end
-    end
-  
-    # Find the player with the maximum votes
-    voted_out_player_id = votes_count.max_by { |_player_id, count| count }&.first
-  
-    # Update the room with the voted-out player
-    @room.update(voted_out_player_id: voted_out_player_id, turn_status: 'result_announced')
-  end
-
 
 
   def room_params
@@ -249,16 +240,63 @@ class RoomsController < ApplicationController
   def player_params
     params.require(:player).permit(:name)
   end
+
+  def fetch_weather_info
+    url = URI("https://deezerdevs-deezer.p.rapidapi.com/infos")
+
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+
+    request = Net::HTTP::Get.new(url)
+    request["X-RapidAPI-Key"] = 'YOUR_RAPIDAPI_KEY'
+    request["X-RapidAPI-Host"] = 'deezerdevs-deezer.p.rapidapi.com'
+
+    response = http.request(request)
+
+    # Parse the JSON response
+    JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
+  end
+
 end
 
-# <h2>Open Characteristics for Other Players</h2>
-# <ul>
-#   <% @players.each do |player| %>
-#     <% unless player == current_user.players.first %>
-#       <li>
-#         <%= player.user.email %>
-#         <%= button_to 'Open Characteristics', set_visible_characteristic_room_path(@room, player_id: player.id), method: :post, remote: true %>
-#       </li>
-#     <% end %>
-#   <% end %>
-# </ul>
+
+  
+  # def vote_for_player
+  #   @room = Room.find(params[:id])
+  #   @player = Player.find(params[:player_id])
+  
+  #   if @room.turn_status == 'voting' && @room.players.exists?(user_id: current_user.id) && @player != current_user.players.first
+  #     Vote.create(player: @player)
+  #     flash[:notice] = 'Ваш голос зараховано!'
+  
+  #     # Check if all players have voted
+  #     if @room.players.all? { |p| p.votes.any? }
+  #       calculate_votes
+  #     end
+  #   else
+  #     flash[:alert] = 'Сталася помилка при голосуванні.'
+  #   end
+  
+  #   redirect_to @room
+  # end
+  
+  # def end_voting
+  #   @room = Room.find(params[:id])
+  
+  #   # Логіка для знаходження гравця з максимальною кількістю голосів
+  #   player_with_max_votes = @room.players.max_by(&:votes_count)
+  
+  #   # Якщо є гравець з максимальною кількістю голосів, викинути його
+  #   player_with_max_votes.destroy if player_with_max_votes
+  
+  #   # Оновити статус кімнати або виконати інші дії, які потрібно зробити після закінчення голосування
+  #   if @room.players.count > 1 && @room.players.count <= @room.limit / 2
+  #     # Якщо залишилася половина або менше гравців, закінчити гру
+  #     @room.update(turn_status: 'game_over', voted_out_player_id: nil)
+  #   else
+  #     @room.update(turn_status: 'waiting_for_characteristic')
+  #   end
+    
+  #   # Повернути або перенаправити на необхідну сторінку
+  #   redirect_to @room, notice: 'Voting ended successfully.'
+  # end

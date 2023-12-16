@@ -7,4 +7,13 @@ class User < ApplicationRecord
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+
+         
+  has_one :profile
+  after_create :create_default_profile
+
+  def create_default_profile
+    Profile.create(user: self, name: email) unless profile
+  end
+
 end
