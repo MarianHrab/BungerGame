@@ -1,11 +1,35 @@
-<p>Public rooms:</p>
+<div class="text-center">
+  <h1>Public rooms:</h1>
 
-<ul>
-  <% @rooms.each do |room| %>
-    <li>
-      <%= link_to room.name, room_path(room) %>
-    </li>
-  <% end %>
-</ul>
+  <!-- Public Rooms Container -->
+  <div class="public-rooms-container bg-dark text-light p-4 my-4 border border-white mx-auto" style="width: 580px; height: 640px; border-radius: 20px;">
+    <!-- Search Room Form -->
+    <form class="form-inline mb-3">
+      <div class="form-group flex-grow-1 mr-3">
+        <label for="searchRoom" class="sr-only">Search Room</label>
+        <input type="text" class="form-control rounded-20 w-100" id="searchRoom" placeholder="Search by room name">
+      </div>
+      <button type="submit" class="btn rounded-20" style="color: black; background-color: #F2B705; border: none; margin-right: 10px; border-radius: 20px;">Search</button>
+    </form>
+    <ul class="list-unstyled">
+      <% @rooms.each do |room| %>
+        <li class="room-item border-bottom py-2">
+          <div class="d-flex justify-content-between align-items-center" style="background-color: #434242; border-radius: 30px">
+            <div class="room-details">
+              <span class="room-name mr-3 ml-3"><%= room.name %></span>
+            </div>
+            <div class="actions mr-3 my-2 ">
+              <span class="player-count"><%= room.players.count %> players</span>
+              <%= link_to 'Connect', room_path(room), class: 'btn btn-dark connect-button ml-3' %>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  </div>
 
-<%= link_to 'Create a Room', new_room_path %>
+  <!-- Container for New Room Creation -->
+  <div class="new-room-container mx-auto">
+    <%= link_to 'Create a Room', new_room_path %>
+  </div>
+</div>
