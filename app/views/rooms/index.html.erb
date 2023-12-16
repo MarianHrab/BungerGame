@@ -1,35 +1,56 @@
 <div class="text-center">
   <h1>Public rooms:</h1>
 
-  <!-- Public Rooms Container -->
-  <div class="public-rooms-container bg-dark text-light p-4 my-4 border border-white mx-auto" style="width: 580px; height: 640px; border-radius: 20px;">
-    <!-- Search Room Form -->
-    <form class="form-inline mb-3">
-      <div class="form-group flex-grow-1 mr-3">
-        <label for="searchRoom" class="sr-only">Search Room</label>
-        <input type="text" class="form-control rounded-20 w-100" id="searchRoom" placeholder="Search by room name">
+  <!-- Bootstrap Grid Container with Margin -->
+  <div class="container-fluid my-4 mx-4"> <!-- Added mx-4 for horizontal margin -->
+    <div class="row">
+      <!-- Public Rooms Container -->
+      <div class="col-md-6 mb-4"> <!-- Added mb-4 for bottom margin -->
+        <div class="public-rooms-container bg-dark text-light p-4 border border-white" style="border-radius: 20px;">
+          <!-- Search Room Form -->
+          <form class="form-inline mb-3">
+            <div class="form-group flex-grow-1 mr-3">
+              <label for="searchRoom" class="sr-only">Search Room</label>
+              <input type="text" class="form-control rounded-20 w-100" id="searchRoom" placeholder="Search by room name">
+            </div>
+            <button type="submit" class="btn rounded-20" style="color: black; background-color: #F2B705; border: none; margin-right: 10px; border-radius: 20px;">Search</button>
+          </form>
+          <ul class="list-unstyled">
+            <% @rooms.each do |room| %>
+              <li class="room-item border-bottom py-2">
+                <div class="d-flex justify-content-between align-items-center" style="background-color: #434242; border-radius: 30px">
+                  <div class="room-details">
+                    <span class="room-name mr-3 ml-4"><%= room.name %></span>
+                  </div>
+                  <div class="actions mr-3 my-2">
+                    <span class="player-count"><%= room.players.count %> players</span>
+                    <%= link_to 'Connect', room_path(room), class: 'btn btn-dark connect-button ml-3' %>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
       </div>
-      <button type="submit" class="btn rounded-20" style="color: black; background-color: #F2B705; border: none; margin-right: 10px; border-radius: 20px;">Search</button>
-    </form>
-    <ul class="list-unstyled">
-      <% @rooms.each do |room| %>
-        <li class="room-item border-bottom py-2">
-          <div class="d-flex justify-content-between align-items-center" style="background-color: #434242; border-radius: 30px">
-            <div class="room-details">
-              <span class="room-name mr-3 ml-3"><%= room.name %></span>
-            </div>
-            <div class="actions mr-3 my-2 ">
-              <span class="player-count"><%= room.players.count %> players</span>
-              <%= link_to 'Connect', room_path(room), class: 'btn btn-dark connect-button ml-3' %>
-            </div>
-          </div>
-        </li>
-      <% end %>
-    </ul>
-  </div>
 
-  <!-- Container for New Room Creation -->
-  <div class="new-room-container mx-auto">
-    <%= link_to 'Create a Room', new_room_path %>
+      <!-- Container for New Room Creation -->
+      <div class="col-md-6 mb-4"> <!-- Added mb-4 for bottom margin -->
+        <div class="new-room-container bg-dark text-light p-4 border border-white" style="border-radius: 20px;">
+          <%= form_with(model: Room.new, url: rooms_path, method: :post, class: 'mb-3', remote: true) do |form| %>
+            <div class="form-group mb-3">
+              <%= form.label :name, "Room Name", class: 'sr-only' %>
+              <%= form.text_field :name, class: 'form-control rounded-20', placeholder: 'Enter room name' %>
+            </div>
+            <div class="form-group mb-3">
+              <%= form.label :limit, "Room Limit", class: 'sr-only' %>
+              <%= form.number_field :limit, min: 1, class: 'form-control rounded-20', placeholder: 'Enter room limit' %>
+            </div>
+            <div class="form-group mb-3">
+              <%= form.submit 'Create Room', class: 'btn rounded-20', style: 'color: #000000; background-color: #F2B705; width: 306px; height: 73px; font-size: 24px; border: none; border-radius: 20px;' %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

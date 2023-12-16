@@ -14,10 +14,17 @@
  *= require_self
  */
  @import "bootstrap";
-
-
-
-
+ 
+ .btn-primary {
+    color: #000000;
+    background-color: #F2B705;
+    width: 144px;
+    height: 31px;
+    border-radius: 40px;
+    text-align: center; /* Center the text horizontally */
+    line-height: 31px; /* Center the text vertically */
+  }
+  
 
 
 

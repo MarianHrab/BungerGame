@@ -1,17 +1,25 @@
-<h1>Edit Profile</h1>
+<div class="container my-5">
+  <div class="row">
+    <div class="col-md-6 mx-auto">
+      <div class="border border-3 border-f2b705 p-4 rounded"> <!-- Update the border color -->
+        <h1 class="text-center mb-4" style="color: #F2B705">Edit Profile</h1>
 
-<%= form_with(model: @profile, url: profile_path, method: :put, local: true, html: {multipart: true}) do |form| %>
-  <div class="field">
-    <%= form.label :name %>
-    <%= form.text_field :name %>
-  </div>
+        <%= form_with(model: @profile, url: profile_path, method: :put, local: true, html: {multipart: true}) do |form| %>
+          <div class="mb-3">
+            <%= form.label :name, class: 'form-label' %>
+            <%= form.text_field :name, class: 'form-control' %>
+          </div>
 
-  <div class="field">
-    <%= form.label :avatar %>
-    <%= form.file_field :avatar %>
-  </div>
+          <div class="mb-3">
+            <%= form.label :avatar, class: 'form-label' %>
+            <%= form.file_field :avatar, class: 'form-control' %>
+          </div>
 
-  <div class="actions">
-    <%= form.submit 'Update Profile' %>
+          <div class="text-center">
+            <%= form.submit 'Update Profile', class: 'btn btn-warning btn-lg mb-3 mt-3', style: 'width: 287px; height: 80px; background-color: #F2B705; color: black; font-weight: bold; font-size: 24px; border-radius: 50px;' %>
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
-<% end %>
+</div>
